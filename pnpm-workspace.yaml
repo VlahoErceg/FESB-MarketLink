@@ -1,3 +1,5 @@
+packages:
+  - 'backend/backend-api'
 allowBuilds:
-  '@parcel/watcher': false
-  unrs-resolver: false
+  '@parcel/watcher': true
+  unrs-resolver: true

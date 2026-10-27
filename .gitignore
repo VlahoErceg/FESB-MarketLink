@@ -1,11 +1,11 @@
 # compiled output
-/dist
-/node_modules
-/build
+**/node_modules/
+**/dist/
+**/build/
 .pnpm-store/
 
 # TypeScript build cache
-*.tsbuildinfo
+**/*.tsbuildinfo
 
 # Logs
 logs
@@ -21,7 +21,7 @@ lerna-debug.log*
 Thumbs.db
 
 # Tests
-/coverage
+**/coverage/
 /.nyc_output
 
 # IDEs and editors
