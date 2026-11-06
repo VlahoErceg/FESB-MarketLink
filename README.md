@@ -6,9 +6,9 @@ A multi-market/store marketplace platform for buying and selling items.
 
 | Topic | File |
 |---|---|
-| **Setup & Installation** | [docs/setup.md](./SETUP.md) |
-| **API Reference** | [docs/api.md](./docs/API.md) |
-| **Database Schema** | [docs/database.md](./docs/DATABASE.md) |
+| **Setup & Installation** | [docs/setup.md](./docs/setup.md) |
+| **API Reference** | [docs/api.md](./docs/api.md) |
+| **Database Schema** | [docs/database.md](./docs/database.md) |
 
 ## Tech Stack
 
