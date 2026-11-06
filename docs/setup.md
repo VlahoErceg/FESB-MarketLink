@@ -61,7 +61,7 @@ All commands run from the project root. No need to cd into subfolders.
 
 ```bash
 # Clone (if you haven't already)
-git clone <your-repo-url>
+git clone https://github.com/VlahoErceg/FESB-MarketLink.git
 cd FESB-MarketLink
 
 # Install all workspace dependencies (backend, frontend)
