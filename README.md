@@ -24,6 +24,5 @@ A multi-market/store marketplace platform for buying and selling items.
 ## Quick Start
 
 ```bash
-corepack enable
-pnpm install
-pnpm dev
+corepack pnpm install
+corepack pnpm dev

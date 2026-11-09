@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "pnpm install",
-    "dev": "pnpm --filter backend-api run start:dev"
+    "setup": "corepack pnpm install",
+    "dev": "corepack pnpm --filter backend-api run start:dev"
   },
   "keywords": [],
   "author": "",
