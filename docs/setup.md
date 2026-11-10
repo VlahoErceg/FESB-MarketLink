@@ -31,27 +31,54 @@ node -v
 
 ## 2. PNPM
 
-This project uses pnpm workspaces. Node 20+ ships with corepack, which manages pnpm for you — no global install needed.
+This project uses pnpm workspaces. Pick **one** of the two options below.
 
-### Step 1: Enable corepack (one-time)
+### Option A: Corepack (if available)
+
+Some Node.js builds ship with corepack. Check if you have it:
+
+```bash
+corepack --version
+```
+
+- **If it prints a version:** Use corepack.
 
 ```bash
 corepack enable
-```
-
-### Step 2: Verify Installation
-
-```bash
 pnpm --version
 ```
 
-If you get a different version or an error:
+If you get a different pnpm version:
 
 ```bash
 corepack use pnpm@12.15.0
 ```
 
-> **Windows Note:** If you encounter a permission error (`EPERM`), close your terminal, reopen PowerShell as **Administrator** (Right-click → *Run as administrator*), and run the command again.
+> **Windows Note:** If you encounter a permission error (`EPERM`), reopen PowerShell as **Administrator** and run `corepack enable` again.
+
+> **Note:** `corepack enable` is a one-time setup. It persists across reboots.
+
+### Option B: Global install via npm
+
+```bash
+npm install -g pnpm
+pnpm --version
+```
+
+> **Windows Note:** Same as above — if you get `EPERM`, reopen PowerShell as **Administrator** and retry.
+
+---
+
+### Verify
+
+Either option should give you:
+
+```bash
+pnpm --version
+# 12.15.0
+```
+
+If `pnpm` is not recognized, your terminal PATH hasn't updated. Restart your terminal or VS Code.
 
 ---
 
