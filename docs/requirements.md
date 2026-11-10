@@ -17,12 +17,33 @@ MarketLink is a multi-vendor marketplace. Buyers browse and order products, sell
 ## Listings, Products, and Categories
 
 - Sellers can manage only their own listings; administrators can manage all listings.
-- A listing requires a title, description, price, category, location and an image.
-- The price must be greater than or equal to zero.
+- A listing requires a title, description, category, location, and an image. A `FIXED_PRICE` product also requires a price; an `AUCTION` product uses its auction's starting price and bids.
+- A fixed sale price must be greater than or equal to zero.
+- A product can be sold either at a fixed price (`FIXED_PRICE`) or by auction (`AUCTION`). Existing fixed-price purchasing behavior remains unchanged.
+- Each auction sells one unit of a product. The seller sets a starting price, minimum bid increment, and start and end times.
+- Auction statuses are `SCHEDULED`, `ACTIVE`, `ENDED`, and `CANCELLED`. The seller may create a new auction after an earlier auction ends without a sale.
+- For a `FIXED_PRICE` product, the product price is used. For an `AUCTION` product, the auction's starting price, current price, and minimum increment govern bidding.
+- A product may have auction history, but may have at most one `SCHEDULED` or `ACTIVE` auction at a time.
 - Only administrators can create and edit categories.
 - A listing can be permanently deleted or marked inactive/archived.
 - The catalog must support search, filtering, sorting, and pagination.
 - The system must track product inventory.
+
+## Auctions and Bids
+
+- Users cannot bid on their own products.
+- Bids are accepted only while the auction is `ACTIVE` and within its scheduled start and end times.
+- The first valid bid must be at least the starting price. Each later bid must exceed the current highest bid by at least the auction's minimum increment.
+- Concurrent bids must be handled safely: every accepted bid must satisfy the current minimum-increment rule, and the current price must not move backwards.
+- When the auction ends, the highest valid bid receives the first purchase offer.
+- Each purchase offer records the auction, selected buyer and bid, final price, associated order, offer status, award time, and offer expiry.
+- A selected bidder has 24 hours from the offer time to accept and start checkout. Until the offer expires or is marked `PAYMENT_REJECTED` or `PAYMENT_TIMED_OUT`, the auction's product unit cannot be sold through a fixed-price listing or another auction offer.
+- Offer statuses are `OFFER_PENDING`, `PAYMENT_PENDING`, `PAID`, `PAYMENT_REJECTED`, `PAYMENT_TIMED_OUT`, and `EXPIRED`. Only one offer can be pending for an auction at a time, and at most one offer can become the paid winner.
+- Auction checkout reuses the existing order and payment system; it does not introduce a separate payment process.
+- Once payment starts, the existing 15-minute payment timeout applies. If payment is rejected or times out, that offer ends and the next-highest valid bidder receives a new 24-hour offer. The failed order attempt is cancelled before moving to the next bidder.
+- If every valid bidder fails to pay or lets their offer expire, the auction ends without a sale.
+- An auction that ends without bids is marked `ENDED` with no winner or order. The seller may create a new auction for the product.
+- Whenever a new valid bid raises the current price, all earlier bidders whose highest bid is now lower receive a stored in-app notification. The current bidder is not notified; email and push notifications are not included.
 
 ## Cart, Orders, and Inventory
 
@@ -72,8 +93,9 @@ The following details are not defined in this document and must be agreed before
 
 - How simulated payment outcomes are triggered and what the buyer sees during a timeout.
 - How an order is split into seller portions when the cart contains products from multiple sellers.
+- Whether a seller may cancel a scheduled or active auction, and what happens to bids if it is cancelled.
 - Additional delivery statuses beyond basic shipped and delivered states. The specification does not require integration with a courier service.
 - The return shipping process and whether returned inventory is restored for resale.
-- Notification types and where users view them.
+- Other notification types and where users view them; outbid notifications are stored in-app.
 - Review format, such as rating range and allowed text.
 - Recommendation criteria, sales overview metrics, and search, filter, and sort fields and behavior.
