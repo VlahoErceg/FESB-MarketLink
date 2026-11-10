@@ -1,18 +1,16 @@
 {
-  "name": "FESB-MarketLink",
+  "name": "fesb-marketlink",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "setup": "pnpm install",
-    "dev": "pnpm --filter backend-api run start:dev"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.15.1"
+  "devDependencies": {
+    "turbo": "^2.11.10"
   }
 }
