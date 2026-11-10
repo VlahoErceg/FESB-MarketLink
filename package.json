@@ -8,13 +8,13 @@
     "setup": "pnpm install",
     "dev:backend": "pnpm --filter backend-api run start:dev",
     "dev:frontend": "pnpm --filter marketlink-web run dev",
-    "dev:all": "concurrently -k \"pnpm --filter backend-api run start:dev\" \"powershell -Command Start-Sleep -Seconds 5; pnpm --filter marketlink-web run dev\""
+    "dev:all": "concurrently -k \"pnpm --filter backend-api run start:dev\" \"wait-on tcp:127.0.0.1:3000 && pnpm --filter marketlink-web run dev\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^10.0.7",
-    "delay": "^7.0.0"
+    "wait-on": "^9.5.1"
   }
 }
