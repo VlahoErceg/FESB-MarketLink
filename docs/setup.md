@@ -25,11 +25,11 @@ node -v
 2. Download the **LTS (Long Term Support)** installer for your operating system (Windows / macOS).
 3. Run the installer and follow the prompt options (keep default settings checked, especially **"Add to PATH"**).
 4. Restart your terminal or VS Code to apply system PATH updates.
-5. Check if its installed (Step 1)
+5. Check if it's installed (Step 1)
 
 ---
 
-## 2. PNPM Global Installation
+## 2. PNPM
 
 This project uses pnpm workspaces. Node 20+ ships with corepack, which manages pnpm for you — no global install needed.
 
@@ -55,28 +55,57 @@ corepack use pnpm@12.15.0
 
 ---
 
-# Installing and Running the Backend
+## 3. Install
 
-All commands run from the project root. No need to cd into subfolders.
+All commands run from the project root. No need to `cd` into subfolders.
 
 ```bash
 # Clone (if you haven't already)
 git clone https://github.com/VlahoErceg/FESB-MarketLink.git
 cd FESB-MarketLink
 
-# Install all workspace dependencies (backend, frontend)
+# Install all workspace dependencies (backend + frontend)
 pnpm install
-
-# Start the backend dev server
-pnpm dev
-
 ```
 
-The backend should now be running at http://localhost:3000.
+---
 
-### Step 2: Verify
+## 4. Run
 
-Go to your browser at http://localhost:3000 or run:
+### Backend
+
+```bash
+pnpm dev:backend
+```
+
+The backend should now be running at **http://localhost:3000**.
+
+### Frontend
+
+```bash
+pnpm dev:frontend
+```
+
+The frontend should now be running at **http://localhost:5173**.
+
+### Both at once
+
+```bash
+pnpm dev:all
+```
+
+Starts the backend, waits for it to be ready, then starts the frontend. Both output in the same terminal.
+
+### Verify
+
+Go to your browser:
+
+```
+http://localhost:3000        ← backend
+http://localhost:5173        ← frontend
+```
+
+Or from the terminal:
 
 ```bash
 curl http://localhost:3000
@@ -84,15 +113,17 @@ curl http://localhost:3000
 
 Expected response:
 
-```bash
+```json
 {
   "message": "Hello World!",
   "statusCode": 200
 }
-
 ```
 
-# Useful Commands
+---
+
+## 5. Useful Commands
+
 All commands run from the project root.
 
 | What | Command |
@@ -100,10 +131,32 @@ All commands run from the project root.
 | Install all dependencies | `pnpm install` |
 | Add a package to the backend | `pnpm add <pkg> --filter backend-api` |
 | Add a dev package to the backend | `pnpm add -D <pkg> --filter backend-api` |
-| Run the backend | `pnpm dev` |
+| Add a package to the frontend | `pnpm add <pkg> --filter marketlink-web` |
+| Add a dev package to the frontend | `pnpm add -D <pkg> --filter marketlink-web` |
+| Add a package to the workspace root | `pnpm add -w <pkg>` |
+| Run the backend | `pnpm dev:backend` |
+| Run the frontend | `pnpm dev:frontend` |
+| Run both | `pnpm dev:all` |
 | Run backend unit tests | `pnpm run test --filter backend-api` |
 | Run backend e2e tests | `pnpm run test:e2e --filter backend-api` |
 | Build the backend | `pnpm run build --filter backend-api` |
+| Build the frontend | `pnpm run build --filter marketlink-web` |
+| Lint the frontend | `pnpm run lint --filter marketlink-web` |
 | Generate a NestJS resource | `pnpm nest g resource <name> --filter backend-api` |
 | Generate a NestJS service | `pnpm nest g service <name> --filter backend-api` |
 
+---
+
+## 6. Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| `pnpm: command not found` | Run `corepack enable`, restart your terminal |
+| `EPERM` permission error (Windows) | Reopen PowerShell as **Administrator** and retry |
+| `node: command not found` | Reinstall Node.js with "Add to PATH" checked, restart terminal |
+| Port 3000 already in use | Close the other process |
+| Port 5173 already in use | Close the other process |
+| `nest: command not found` | Use `pnpm nest ... --filter backend-api` instead of bare `nest` |
+| `Cannot find module 'class-validator'` | Run `pnpm add class-validator class-transformer --filter backend-api` from the root |
+| TypeScript errors after clone | Make sure you ran `pnpm install` from the **root**, not from a subfolder |
+| `corepack` not recognized | You're on Node < 16. Upgrade to Node 20+ LTS |

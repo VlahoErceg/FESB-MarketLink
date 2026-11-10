@@ -18,7 +18,7 @@ A multi-market/store marketplace platform for buying and selling items.
 | Validation | class-validator |
 | Package Manager | pnpm (workspaces) |
 | Runtime | Node.js 20+ |
-| Frontend | *(TBD)* |
+| Frontend | React 19, TypeScript, Vite |
 | Database | *(TBD)* |
 
 ## Quick Start
@@ -26,4 +26,5 @@ A multi-market/store marketplace platform for buying and selling items.
 ```bash
 corepack enable
 pnpm install
-pnpm dev
+pnpm dev:all
+```
