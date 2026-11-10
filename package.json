@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "setup": "pnpm install",
-    "dev": "pnpm --filter backend-api run start:dev"
+    "dev:backend": "pnpm --filter backend-api run start:dev",
+    "dev:frontend": "pnpm --filter marketlink-web run dev",
+    "dev:all": "concurrently -k \"pnpm --filter backend-api run start:dev\" \"powershell -Command Start-Sleep -Seconds 5; pnpm --filter marketlink-web run dev\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.15.1"
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "delay": "^7.0.0"
   }
 }
