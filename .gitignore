@@ -2,10 +2,15 @@
 **/node_modules/
 **/dist/
 **/build/
+**/dist-ssr/
 .pnpm-store/
 
 # TypeScript build cache
 **/*.tsbuildinfo
+
+# Vite
+*.local
+
 
 # Logs
 logs
