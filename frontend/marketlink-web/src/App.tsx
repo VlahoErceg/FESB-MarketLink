@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import './App.css'
 import './Nova.css'
 import './Shop.css'
-import { AuctionSection, auctionLots } from './AuctionSection'
+import { AuctionSection } from './AuctionSection'
+import { auctionLots, auctionTimeRemaining } from './auctionData'
 import './Auction.css'
 
 type Role = 'buyer' | 'seller' | 'admin'
@@ -154,6 +155,8 @@ function App() {
   const cartTotal = cartItems.reduce((total, entry) => total + entry.product.price * entry.line.quantity, 0)
   const selectedProduct = products.find((product) => product.id === selectedProductId)
   const selectedAuction = auctionLots.find((lot) => lot.id === selectedAuctionId)
+  const selectedAuctionRemaining = selectedAuction ? auctionTimeRemaining(selectedAuction.end_time, now) : ''
+  const selectedAuctionEnded = selectedAuctionRemaining === 'Završena'
   const unreadCount = notices.filter((notice) => !notice.read).length
 
   function addNotice(text: string) {
@@ -189,10 +192,11 @@ function App() {
   }
 
   function requestAuctionBid(id: number) {
-    if (!user) { setPendingAuctionId(id); setAuthRole('buyer'); setAuthOpen(true); setToast('Prijavi se kao kupac prije slanja ponude.'); return }
-    if (user.role !== 'buyer') { setToast('Za ponudu odaberi demo ulogu Kupac.'); return }
     const lot = auctionLots.find((item) => item.id === id)
     if (!lot) return
+    if (new Date(lot.end_time).getTime() <= now) { setToast('Aukcija je završena; ponude više nisu moguće.'); return }
+    if (!user) { setPendingAuctionId(id); setAuthRole('buyer'); setAuthOpen(true); setToast('Prijavi se kao kupac prije slanja ponude.'); return }
+    if (user.role !== 'buyer') { setToast('Za ponudu odaberi demo ulogu Kupac.'); return }
     setBidAuctionId(id)
     setAuctionBidAmount(String((auctionUpdates[id]?.bid ?? lot.bid) + 5))
   }
@@ -202,6 +206,7 @@ function App() {
     if (bidAuctionId === null) return
     const lot = auctionLots.find((item) => item.id === bidAuctionId)
     const amount = Number(auctionBidAmount)
+    if (lot && new Date(lot.end_time).getTime() <= now) { setBidAuctionId(null); setToast('Aukcija je završena; ponuda nije prihvaćena.'); return }
     if (!lot || amount < (auctionUpdates[bidAuctionId]?.bid ?? lot.bid) + 5) { setToast('Ponuda mora biti barem 5 € viša od trenutačne.'); return }
     setAuctionUpdates((current) => ({ ...current, [bidAuctionId]: { bid: amount, bids: (current[bidAuctionId]?.bids ?? lot.bids) + 1 } }))
     setBidAuctionId(null)
@@ -226,7 +231,8 @@ function App() {
       setPendingAuctionId(null)
       if (authRole === 'buyer') {
         const lot = auctionLots.find((item) => item.id === id)
-        if (lot) { setBidAuctionId(id); setAuctionBidAmount(String((auctionUpdates[id]?.bid ?? lot.bid) + 5)) }
+        if (lot && new Date(lot.end_time).getTime() > now) { setBidAuctionId(id); setAuctionBidAmount(String((auctionUpdates[id]?.bid ?? lot.bid) + 5)) }
+        else setToast('Aukcija je završena; ponude više nisu moguće.')
       }
       else setToast('Za ponudu se prijavi kao Kupac.')
     }
@@ -360,11 +366,33 @@ function App() {
         <section className="community-banner" id="community"><div className="community-mark">m.</div><div><div className="eyebrow">DOBRE STVARI PUTUJU</div><h2>Kupi pažljivo.<br /><span>Proslijedi dalje.</span></h2></div><button className="button-light" onClick={() => { if (!user) setAuthOpen(true); else { setPage('dashboard'); setShowNewProduct(true) } }}>Postani prodavač <span>↗</span></button><div className="community-decoration">✳</div></section>
       </main>}
 
-      {page === 'shop' && <AuctionSection updates={auctionUpdates} onBid={requestAuctionBid} onSelect={(id) => { setSelectedAuctionId(id); setPage('auction'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />}
+      {page === 'shop' && <AuctionSection updates={auctionUpdates} onBid={requestAuctionBid} onSelect={(id) => { setSelectedAuctionId(id); setPage('auction'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} now={now} />}
 
       {page === 'product' && selectedProduct && <main className="app-page item-detail-page"><button className="subtle-action" onClick={() => setPage('shop')}>← Natrag na tržnicu</button><div className="item-detail-layout"><div className={`item-detail-image ${selectedProduct.tone}`}><span>{selectedProduct.image}</span><small>{selectedProduct.condition}</small></div><article className="item-detail-content"><div className="eyebrow">{selectedProduct.category} · ARTIKL #{selectedProduct.id}</div><h1>{selectedProduct.name}</h1><div className="item-detail-rating">★ {selectedProduct.rating ? selectedProduct.rating.toFixed(1) : 'Novo'} <span>({selectedProduct.reviews} recenzija)</span></div><strong className="item-detail-price">€{selectedProduct.price.toFixed(2)}</strong><p className="item-detail-description">Ovaj {selectedProduct.category.toLocaleLowerCase('hr')} artikl prodaje član MarketLink zajednice. Pregledaj stanje i podatke o prodavaču prije kupnje.</p><div className="item-detail-facts"><div><span>Stanje</span><strong>{selectedProduct.condition}</strong></div><div><span>Dostupnost</span><strong>{selectedProduct.stock ? `${selectedProduct.stock} komada` : 'Nedostupno'}</strong></div><div><span>Lokacija</span><strong>{selectedProduct.city}</strong></div><div><span>Kategorija</span><strong>{selectedProduct.category}</strong></div></div><section className="item-seller-panel"><span className="seller-avatar">{selectedProduct.seller.split(' ').map((part) => part[0]).join('')}</span><div><small>PRODAVAČ</small><strong>{selectedProduct.seller}</strong><span>★ {selectedProduct.rating.toFixed(1)} · {selectedProduct.reviews} recenzija</span></div></section><button className="auth-submit" disabled={!selectedProduct.stock} onClick={() => addToCart(selectedProduct)}>{selectedProduct.stock ? 'Dodaj u košaricu' : 'Trenutačno nedostupno'} <span>＋</span></button><small className="demo-disclaimer">Informacije o artiklu prikazuju se iz lokalnih demo podataka.</small></article></div></main>}
 
-      {page === 'auction' && selectedAuction && <main className="app-page item-detail-page"><button className="subtle-action" onClick={() => setPage('shop')}>← Natrag na tržnicu</button><div className="item-detail-layout"><div className={`item-detail-image ${selectedAuction.tone}`}><span>{selectedAuction.image}</span><small>{selectedAuction.condition}</small></div><article className="item-detail-content"><div className="eyebrow">AUKCIJA U TIJEKU · {selectedAuction.category}</div><h1>{selectedAuction.title}</h1><p className="item-detail-description">Ovaj artikl prodaje član MarketLink zajednice. Aukcija završava za {selectedAuction.hours < 24 ? `${selectedAuction.hours} sati` : `${Math.ceil(selectedAuction.hours / 24)} dana`}.</p><div className="auction-detail-facts"><span>Trenutačna ponuda<strong>€{(auctionUpdates[selectedAuction.id]?.bid ?? selectedAuction.bid).toFixed(2)}</strong></span><span>Broj ponuda<strong>{auctionUpdates[selectedAuction.id]?.bids ?? selectedAuction.bids}</strong></span><span>Preostalo vrijeme<strong>{selectedAuction.hours < 24 ? `${selectedAuction.hours} h` : `${Math.ceil(selectedAuction.hours / 24)} d`}</strong></span><span>Stanje<strong>{selectedAuction.condition}</strong></span><span>Lokacija<strong>{selectedAuction.city}</strong></span><span>Kategorija<strong>{selectedAuction.category}</strong></span></div><section className="item-seller-panel"><span className="seller-avatar">{selectedAuction.seller.split(' ').map((part) => part[0]).join('')}</span><div><small>PRODAVAČ</small><strong>{selectedAuction.seller}</strong><span>Član lokalne MarketLink zajednice · {selectedAuction.city}</span></div></section><button className="auth-submit" onClick={() => requestAuctionBid(selectedAuction.id)}>Daj ponudu <span>→</span></button><small className="demo-disclaimer">Ponude su demonstracijske i spremaju se samo u ovom pregledniku.</small></article></div></main>}
+      {page === 'auction' && selectedAuction && <main className="app-page item-detail-page">
+        <button className="subtle-action" onClick={() => setPage('shop')}>← Natrag na tržnicu</button>
+        <div className="item-detail-layout">
+          <div className={'item-detail-image ' + selectedAuction.tone}><span>{selectedAuction.image}</span><small>{selectedAuction.condition}</small></div>
+          <article className="item-detail-content">
+            <div className="eyebrow">{selectedAuctionEnded ? 'ZAVRŠENA AUKCIJA' : 'AUKCIJA U TIJEKU'} · {selectedAuction.category}</div>
+            <h1>{selectedAuction.title}</h1>
+            <p className="item-detail-description">{selectedAuctionEnded ? 'Ova aukcija je završena i nove ponude više nisu moguće.' : <>Ovaj artikl prodaje član MarketLink zajednice. Preostalo vrijeme: {selectedAuctionRemaining}.</>}</p>
+            <div className="auction-detail-facts">
+              <span>Trenutačna ponuda<strong>€{(auctionUpdates[selectedAuction.id]?.bid ?? selectedAuction.bid).toFixed(2)}</strong></span>
+              <span>Broj ponuda<strong>{auctionUpdates[selectedAuction.id]?.bids ?? selectedAuction.bids}</strong></span>
+              <span>{selectedAuctionEnded ? 'Status aukcije' : 'Preostalo vrijeme'}<strong>{selectedAuctionRemaining}</strong></span>
+              <span>Završava<strong>{new Date(selectedAuction.end_time).toLocaleString('hr-HR')}</strong></span>
+              <span>Stanje<strong>{selectedAuction.condition}</strong></span>
+              <span>Lokacija<strong>{selectedAuction.city}</strong></span>
+              <span>Kategorija<strong>{selectedAuction.category}</strong></span>
+            </div>
+            <section className="item-seller-panel"><span className="seller-avatar">{selectedAuction.seller.split(' ').map((part) => part[0]).join('')}</span><div><small>PRODAVAČ</small><strong>{selectedAuction.seller}</strong><span>Član lokalne MarketLink zajednice · {selectedAuction.city}</span></div></section>
+            <button className="auth-submit" disabled={selectedAuctionEnded} onClick={() => requestAuctionBid(selectedAuction.id)}>{selectedAuctionEnded ? 'Aukcija završena' : 'Daj ponudu'} <span>{selectedAuctionEnded ? '✓' : '→'}</span></button>
+            <small className="demo-disclaimer">Ponude su demonstracijske i spremaju se samo u ovom pregledniku.</small>
+          </article>
+        </div>
+      </main>}
 
       {page === 'cart' && <main className="app-page"><div className="page-heading"><div><div className="eyebrow">TVOJA KUPOVINA</div><h1>Košarica <span>({cartCount})</span></h1><p>Pregledaj artikle prije potvrde narudžbe.</p></div><button className="subtle-action" onClick={() => setPage('shop')}>← Nastavi kupovati</button></div>{cartItems.length ? <div className="cart-layout"><section className="cart-lines">{cartItems.map(({ line, product }) => <article className="cart-line" key={product.id}><div className={`cart-line-art ${product.tone}`}>{product.image}</div><div className="cart-line-info"><small>{product.seller} · {product.city}</small><h3>{product.name}</h3><span>€{product.price.toFixed(2)} po komadu · {product.stock} dostupno</span><div className="quantity-control"><button aria-label="Smanji količinu" onClick={() => updateQuantity(product.id, line.quantity - 1)}>−</button><span>{line.quantity}</span><button aria-label="Povećaj količinu" disabled={line.quantity >= product.stock} onClick={() => updateQuantity(product.id, line.quantity + 1)}>＋</button><button className="remove-line" onClick={() => updateQuantity(product.id, 0)}>Ukloni</button></div></div><strong>€{(product.price * line.quantity).toFixed(2)}</strong></article>)}</section><aside className="order-summary"><h2>Sažetak narudžbe</h2><div><span>Proizvodi ({cartCount})</span><b>€{cartTotal.toFixed(2)}</b></div><div><span>Dostava</span><b>Izračun pri predaji</b></div><div className="summary-total"><span>Ukupno</span><strong>€{cartTotal.toFixed(2)}</strong></div><button className="button-primary checkout-button" onClick={requestCheckout}>Nastavi na plaćanje <span>→</span></button><p>Testno plaćanje je simulirano. Ne unosite podatke kartice.</p></aside></div> : <div className="empty-panel"><span>🧺</span><h2>Košarica je prazna</h2><p>Pronađi nešto posebno na tržnici.</p><button className="button-primary" onClick={() => setPage('shop')}>Istraži proizvode <span>↗</span></button></div>}</main>}
 
