@@ -1,75 +1,27 @@
-# React + TypeScript + Vite
+# MarketLink — frontend demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Responzivno sučelje višepredavačke web-tržnice izrađeno u Reactu, TypeScriptu i Viteu. Projektna specifikacija opisana je u lokalnom frontendu; ovaj paket implementira samo korisničko sučelje i simulacije u pregledniku.
 
-Currently, two official plugins are available:
+## Pokretanje
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+corepack pnpm --filter marketlink-web dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Vite će ispisati lokalnu adresu za otvaranje u pregledniku.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Što možete isprobati
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Katalog s pretragom, filtriranjem po kategoriji, stanju, gradu, cijeni i zalihi, sortiranjem i paginacijom.
+- Košaricu s više prodavača, izmjenom količine i provjerom zalihe.
+- Simulirano plaćanje s ishodima uspjeh, odbijanje i timeout. Ne unose se niti obrađuju podaci kartice.
+- Demo prijavu s ulogama kupca, prodavača i administratora.
+- Nadzorne ploče: kupčeve narudžbe, samo pripadajuće stavke za prodavača te upravljanje katalogom za administratora.
+- Automatske demo prijelaze narudžbe iz pripreme u slanje i dostavu, spremljene obavijesti i recenzije nakon dostave.
+- Objašnjene preporuke i graf prodaje za odabranu demo ulogu.
 
-```
+## Granice prototipa
+
+Podaci, prijava, plaćanje, statusi, zalihe i uloge simuliraju se samo u frontend aplikaciji te se spremaju u `localStorage` preglednika. Uloge nisu sigurnosna kontrola, a više preglednika ili kupaca ne dijeli pouzdano zaključavanje zalihe. Za stvarni rad potrebni su autentikacija, autorizacija, API, transakcijska baza i pružatelj plaćanja.
+
+- Aukcije s filtrima za kategoriju, grad i vrijeme završetka; ponuda traži prijavu Kupca i sprema se lokalno kao demo.

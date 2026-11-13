@@ -29,20 +29,21 @@ node -v
 
 ---
 
-## 2. PNPM Global Installation
+## 2. Run pnpm with Corepack
 
 This project uses pnpm workspaces. Node 20+ ships with corepack, which manages pnpm for you — no global install needed.
 
-### Step 1: Enable corepack (one-time)
+### Step 1: Check pnpm through Corepack
 
 ```bash
-corepack enable
+corepack pnpm --version
 ```
 
 ### Step 2: Verify Installation
 
 ```bash
-pnpm --version
+corepack pnpm install
+corepack pnpm dev
 ```
 
 If you get a different version or an error:
@@ -65,10 +66,10 @@ git clone https://github.com/VlahoErceg/FESB-MarketLink.git
 cd FESB-MarketLink
 
 # Install all workspace dependencies (backend, frontend)
-pnpm install
+corepack pnpm install
 
 # Start the backend dev server
-pnpm dev
+corepack pnpm dev
 
 ```
 
@@ -97,10 +98,10 @@ All commands run from the project root.
 
 | What | Command |
 |---|---|
-| Install all dependencies | `pnpm install` |
+| Install all dependencies | `corepack pnpm install` |
 | Add a package to the backend | `pnpm add <pkg> --filter backend-api` |
 | Add a dev package to the backend | `pnpm add -D <pkg> --filter backend-api` |
-| Run the backend | `pnpm dev` |
+| Run the backend | `corepack pnpm dev` |
 | Run backend unit tests | `pnpm run test --filter backend-api` |
 | Run backend e2e tests | `pnpm run test:e2e --filter backend-api` |
 | Build the backend | `pnpm run build --filter backend-api` |
