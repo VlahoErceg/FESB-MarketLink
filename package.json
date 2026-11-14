@@ -6,6 +6,8 @@
   "scripts": {
     "setup": "pnpm install",
     "dev": "turbo dev",
+    "dev:backend": "turbo dev --filter backend-api",
+    "dev:frontend": "turbo dev --filter marketlink-web",
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test"
