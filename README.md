@@ -15,16 +15,18 @@ A multi-market/store marketplace platform for buying and selling items.
 | Layer | Technology |
 |---|---|
 | Backend | NestJS 12, TypeScript |
+| Frontend | React 19, TypeScript, Vite |
 | Validation | class-validator |
 | Package Manager | pnpm (workspaces) |
+| Task Runner | Turborepo |
 | Runtime | Node.js 20+ |
-| Frontend | React 19, TypeScript, Vite |
-| Database | *(TBD)* |
+| Database | PostgreSQL |
+
 
 ## Quick Start
 
 ```bash
 corepack enable
 pnpm install
-pnpm dev:all
+pnpm dev
 ```
